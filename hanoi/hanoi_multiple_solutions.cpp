@@ -260,14 +260,15 @@ void draw_tower(int n, char src)
 // 画出汉诺塔一块的移动
 void draw_tower_move(char src, char dst)
 {
-    int layer = top[dst - 'A'];
+    // 需要移动的圆盘编号(1-10)
+    int num = t[dst - 'A'][top[dst - 'A'] - 1];
     // 圆盘向上移动
     for (int i = 14 - top[src - 'A']; i > 1; i--)
     {
-        cct_showstr(12 + 32 * (src - 'A') - layer, i, NULL, COLOR_BLACK, COLOR_BLACK, 1, 2 * layer + 1);
+        cct_showstr(12 + 32 * (src - 'A') - num, i, NULL, COLOR_BLACK, COLOR_BLACK, 1, 2 * num + 1);
         if (i > 2)
             cct_showch(12 + 32 * (src - 'A'), i, ' ', COLOR_HYELLOW, COLOR_BLACK, 1);
-        cct_showstr(12 + 32 * (src - 'A') - layer, i - 1, NULL, layer, COLOR_BLACK, 1, 2 * layer + 1);
+        cct_showstr(12 + 32 * (src - 'A') - num, i - 1, NULL, num, COLOR_BLACK, 1, 2 * num + 1);
 
         // 根据延迟进行休眠
 		if (delay == 0)
@@ -276,11 +277,11 @@ void draw_tower_move(char src, char dst)
 			Sleep(SLEEP * (5 - delay));
     }
 
-    // 
+    // 圆盘左右移动
     for (int i = 12 + 32 * (src - 'A'); i != 12 + 32 * (dst - 'A'); src > dst ? i-- : i++)
     {
-        cct_showch(i + (src > dst ? layer : -layer), 1, ' ', COLOR_BLACK, COLOR_BLACK, 1);
-        cct_showch(i + (src > dst ? -layer - 1 : layer + 1), 1, ' ', layer, COLOR_BLACK, 1);
+        cct_showch(i + (src > dst ? num : -num), 1, ' ', COLOR_BLACK, COLOR_BLACK, 1);
+        cct_showch(i + (src > dst ? -num - 1 : num + 1), 1, ' ', num, COLOR_BLACK, 1);
 
         // 根据延迟进行休眠
 		if (delay == 0)
@@ -289,12 +290,13 @@ void draw_tower_move(char src, char dst)
 			Sleep(SLEEP * (5 - delay));
     }
 
+    // 圆盘向下移动
     for (int i = 1; i <= 14 - top[dst - 'A']; i++)
     {
-        cct_showstr(12 + 32 * (dst - 'A') - layer, i, NULL, COLOR_BLACK, COLOR_BLACK, 1, 2 * layer + 1);
+        cct_showstr(12 + 32 * (dst - 'A') - num, i, NULL, COLOR_BLACK, COLOR_BLACK, 1, 2 * num + 1);
         if (i > 2)
             cct_showch(12 + 32 * (dst - 'A'), i, ' ', COLOR_HYELLOW, COLOR_BLACK, 1);
-        cct_showstr(12 + 32 * (dst - 'A') - layer, i + 1, NULL, layer, COLOR_BLACK, 1, 2 * layer + 1);
+        cct_showstr(12 + 32 * (dst - 'A') - num, i + 1, NULL, num, COLOR_BLACK, 1, 2 * num + 1);
 
         // 根据延迟进行休眠
 		if (delay == 0)
@@ -472,7 +474,7 @@ void mode8()
     draw_tower(n, src);
     // 打印汉诺塔竖形
     cct_gotoxy(0, offset);
-    print_tower_vertical(n, src, dst, 0, 1);
+    print_tower_vertical(n, src, dst, 15, 1);
     
     // 开始汉诺塔移动
     cct_setcolor();
@@ -483,9 +485,58 @@ void mode8()
     pause();
 }
 
+// 游戏结束
+bool game_over(char dst, int n)
+{
+    if (top[dst - 'A'] == n)
+        return true;
+    return false;
+}
+
+// 运行游戏
+void game_run()
+{
+    cct_gotoxy(0, 32);
+    cct_setcursor(CURSOR_VISIBLE_NORMAL);
+    cout << "请输入移动的柱号(命令形式：AC=A顶端的盘子移动到C，Q=退出) ：";
+    cout << "                 ";
+    cct_gotoxy(60, 32);
+
+    for (; ;) {
+
+    }
+
+
+
+}
+
 void mode9()
 {
+    // 汉诺塔的相关变量
+    int n;
+    char src, dst, tmp;
+    int input[4];		// 无法使用指针，曲线救国获取输入
+    int mod = 8;
+    READ_INPUT;
+    //delay = 0;
+    cct_cls();
+    cout << "从 " << src << " 移动到 " << dst << "，共 " << n << " 层 " << endl;
+    draw_tower_post();
+    draw_tower(n, src);
+    // 打印汉诺塔竖形
+    cct_gotoxy(0, offset);
+    print_tower_vertical(n, src, dst, 15, 1);
 
+    // 开始汉诺塔移动
+    //cct_setcolor();
+    //hanoi(n, src, tmp, dst, mod);
+    while (!game_over(dst, n)) {
+
+    }
+
+    // 结束
+    cct_gotoxy(0, 32);
+    pause();
 }
 
 void mode0()
