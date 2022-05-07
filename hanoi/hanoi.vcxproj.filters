@@ -24,7 +24,7 @@
     <ClCompile Include="hanoi_multiple_solutions.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="test-cct.cpp">
+    <ClCompile Include="hanoi_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

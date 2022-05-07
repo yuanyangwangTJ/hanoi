@@ -1,5 +1,5 @@
-
 #include "cmd_console_tools.h"
+#include "hanoi.h"
 
 /* ----------------------------------------------------------------------------------
 
@@ -25,11 +25,51 @@
 ***************************************************************************/
 int main()
 {
-
-
 	/* demo中首先执行此句，将cmd窗口设置为40行x120列（缓冲区宽度120列，行数9000行，即cmd窗口右侧带有垂直滚动杆）*/
 	cct_setconsoleborder(120, 40, 120, 9000);
+
+	int mod;	// 选择的运行模式
+	while (1) {
+		mod = menu();
+
+		switch (mod) {
+			case 1:
+				mode1();
+				break;
+			case 2:
+				mode2();
+				break;
+			case 3:
+				mode3();
+				break;
+			case 4:
+				mode4();
+				break;
+			case 5:
+				mode5();
+				break;
+			case 6:
+				mode6();
+				break;
+			case 7:
+				mode7();
+				break;
+			case 8:
+				mode8();
+				break;
+			case 9:
+				mode9();
+				break;
+			case 0:
+				mode0();
+				break;
+			default:
+				break;
+		}
+		cct_cls();
+	}
 
 
 	return 0;
 }
+

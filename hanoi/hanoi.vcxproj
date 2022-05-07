@@ -140,9 +140,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cmd_console_tools.cpp" />
+    <ClCompile Include="hanoi_main.cpp" />
     <ClCompile Include="hanoi_menu.cpp" />
     <ClCompile Include="hanoi_multiple_solutions.cpp" />
-    <ClCompile Include="test-cct.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmd_console_tools.h" />

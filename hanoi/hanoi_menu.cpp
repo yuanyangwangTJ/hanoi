@@ -1,3 +1,8 @@
+#include <iostream>
+#include <Windows.h>
+#include <conio.h>
+
+using namespace std;
 
 /* ----------------------------------------------------------------------------------
 
@@ -20,3 +25,33 @@
   返 回 值：
   说    明：
 ***************************************************************************/
+
+// 菜单功能打印并选择，return 输入的菜单选项
+int menu()
+{
+	// 首先打印菜单
+	cout << "---------------------------------" << endl;
+	cout << "1.基本解" << endl;
+	cout << "2.基本解(步数记录)" << endl;
+	cout << "3.内部数据显示(横向)" << endl;
+	cout << "4.内部数据显示(纵向+横向)" << endl;
+	cout << "5.图形解-预备-画三个圆柱" << endl;
+	cout << "6.图形解-预备-在起始柱上画n个盘子" << endl;
+	cout << "7.图形解-预备-第一次移动" << endl;
+	cout << "8.图形解-自动移动版本" << endl;
+	cout << "9.图形解-游戏版" << endl;
+	cout << "0.退出" << endl;
+	cout << "---------------------------------" << endl;
+	cout << "[请选择:]";
+
+	int choose;		// 记录选项
+	while (1)
+	{
+		choose = _getch();
+		choose -= '0';
+		if (choose <= 9 && choose >= 0)
+			break;
+	}
+	cout << choose << endl << endl;
+	return choose;
+}
