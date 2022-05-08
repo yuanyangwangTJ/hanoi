@@ -260,6 +260,9 @@ void draw_tower(int n, char src)
 // 画出汉诺塔一块的移动
 void draw_tower_move(char src, char dst)
 {
+    // 光标不可见
+    cct_setcursor(CURSOR_INVISIBLE);
+
     // 需要移动的圆盘编号(1-10)
     int num = t[dst - 'A'][top[dst - 'A'] - 1];
     // 圆盘向上移动
@@ -304,6 +307,8 @@ void draw_tower_move(char src, char dst)
 		else
 			Sleep(SLEEP * (5 - delay));
     }
+    
+    cct_setcursor(CURSOR_VISIBLE_NORMAL);
 
     return;
 }
@@ -493,21 +498,122 @@ bool game_over(char dst, int n)
     return false;
 }
 
-// 运行游戏
-void game_run()
+// 现在可以使用指针
+// 运行游戏，获取到src和dst，游戏退出src='Q'
+void game_run(char *begin, char *end)
 {
-    cct_gotoxy(0, 32);
+    cct_gotoxy(0, 34);
     cct_setcursor(CURSOR_VISIBLE_NORMAL);
     cout << "请输入移动的柱号(命令形式：AC=A顶端的盘子移动到C，Q=退出) ：";
     cout << "                 ";
-    cct_gotoxy(60, 32);
+    cct_gotoxy(60, 34);
 
-    for (; ;) {
+    char src = 0, tmp, dst = 0;
+    int cnt = 0;
+    int game_errno = 0;
+    /*
+    * 0  正确
+    * 1  输入等错误
+    * 2  大盘压小盘，非法移动！
+    * 3  源柱为空
+    */
 
+    for (; ; cnt++) {
+
+        // 限制输入的字符
+        if (cnt > 15) {
+            // 超过最大限制后重置
+            src = dst = 0;
+            game_errno = 0;
+            cnt = 0;
+            cct_gotoxy(60, 34);
+            cout << "                      ";
+            cct_gotoxy(60, 34);
+        }
+
+
+        tmp = _getche();
+        if (!((tmp >= 'A' && tmp <= 'C') || (tmp >= 'a' && tmp <= 'c') || tmp == '\r' || tmp == 'q' || tmp == 'Q')) {
+            game_errno = 1;     // 非法字符输入错误
+        }
+        if (tmp >= 'a' && tmp <= 'z') {
+            tmp -= 32;
+        }
+
+        // 下面的判断建立在game_errno为0的情形下
+        if (game_errno == 0 && tmp >= 'A' && tmp <= 'Z') {
+            if (dst != 0)
+                game_errno = 1;     // 输入超过两个字符，错误
+            if (src == 0) {
+                src = tmp;
+                // 可能出现为 Q 的情形
+                if (src < 'A' && src > 'C')
+                    game_errno = 1;
+                // 在此情形下判断源柱是否为空
+                else if (src >= 'A' && src <= 'C' && top[src - 'A'] == 0 && game_errno == 0)
+                    game_errno = 3;     // 源柱为空
+            }
+            else if (game_errno == 0) {
+                dst = tmp;
+                if (dst < 'A' || dst > 'C' || src == dst)
+                    game_errno = 1; // 字符重复，非法错误
+
+                if (dst >= 'A' && dst <= 'C' && src >= 'A' && src <= 'C') {
+					// 判断逻辑错误
+					int top1, top2;
+					top1 = top[src - 'A'];
+					top2 = top[dst - 'A'];
+
+					if (game_errno == 0 && top1 > 1 && top2 > 0 && t[dst - 'A'][top2 - 1] < t[src - 'A'][top1 - 1])
+						game_errno = 2;     // 大盘压小盘，非法移动！ 
+                }
+
+            }
+
+        }
+
+        if (tmp == '\r') {
+            // 只有一个回车的情形处理
+            if (src == 0)
+                game_errno = 1;
+
+            if (game_errno) {
+                cout << endl;
+				if (game_errno == 2)
+                    cout << "大盘压小盘，非法移动！";
+                if (game_errno == 3)
+                    cout << "源柱为空！";
+                // 退出
+                if (game_errno == 1 && src == 'Q' && dst == 0) {
+                    *begin = src;
+                    break;
+                }
+
+                // 延时后清空错误
+                if (game_errno != 1) {
+                    Sleep(1000);
+                    cct_gotoxy(0, 35);
+                    cout << "                              ";
+                }
+
+                // 重新读取输入
+                game_errno = 0;
+                src = dst = 0;
+                cnt = 0;
+                cct_gotoxy(60, 34);
+                cout << "                 ";
+                cct_gotoxy(60, 34);
+                continue;
+            }
+            else {
+
+                // 无错误跳出循环
+                *begin = src;
+                *end = dst;
+                break;
+            }
+        }
     }
-
-
-
 }
 
 void mode9()
@@ -527,15 +633,26 @@ void mode9()
     cct_gotoxy(0, offset);
     print_tower_vertical(n, src, dst, 15, 1);
 
-    // 开始汉诺塔移动
-    //cct_setcolor();
-    //hanoi(n, src, tmp, dst, mod);
+	char begin = 0, end = 0;
     while (!game_over(dst, n)) {
-
+        cct_setcolor();
+        game_run(&begin, &end);
+        if (begin == 'Q')
+            break;
+        update_tower(begin, end);
+        print_tower_vertical(n, begin, end, 15, 0);
+        draw_tower_move(begin, end);
     }
+    // 输出结束情形
+    cct_gotoxy(0, 35);
+    cct_setcolor();
+    if (begin == 'Q')
+        cout << "游戏终止！！！";
+    else 
+		cout << "游戏结束！";
 
+    cct_gotoxy(0, 37);
     // 结束
-    cct_gotoxy(0, 32);
     pause();
 }
 
